@@ -1,0 +1,35 @@
+/* Program Number: 61
+Student Name: Yashub Goel; Register Number: IMT2023117
+Date: 12-04-2025
+Description: Write separate programs using the sigaction
+system call to catch the following signals:
+c. SIGFPE
+*/
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+
+void sigfpe_handler(int signum)
+{
+    printf("Caught SIGFPE (%d)!\n", signum);
+    exit(0); // Exit gracefully after handling
+}
+
+int main()
+{
+    struct sigaction sa;
+    sa.sa_handler = sigfpe_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    if (sigaction(SIGFPE, &sa, NULL) == -1)
+    {
+        perror("sigaction");
+        return 1;
+    }
+
+    printf("Attempting to cause a floating-point exception...\n");
+    int result = 10 / 0; // This will trigger SIGFPE
+
+    printf("Result: %d\n", result); // This line should not be reached
+}
