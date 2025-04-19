@@ -30,5 +30,4 @@ int main()
     sleep(5);
 
     printf("Program finished.\n");
-    return 0;
 }
