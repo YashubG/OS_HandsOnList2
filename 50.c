@@ -17,9 +17,10 @@ void *threadA(void *arg)
     sem_wait(&sem1);
     printf("Thread A: Acquired semaphore 1.\n");
     // Wait to acquire semaphore sem2 -> Infinite wait since threadB holds sem2
-    // Lines after this won't be executed.
-
     sem_wait(&sem2);
+    // Lines after this won't be executed.
+    //-------------------------------------------------------------------------------------------------------------------
+
     printf("Thread A: Acquired semaphore 2.\n");
     sem_post(&sem2);
     sem_post(&sem1);
@@ -32,9 +33,10 @@ void *threadB(void *arg)
     sem_wait(&sem2);
     printf("Thread B: Acquired semaphore 2.\n");
     // Wait to acquire semaphore sem1 -> Infinite wait since threadB holds sem1
-    // Lines after this won't be executed.
-
     sem_wait(&sem1);
+    // Lines after this won't be executed.
+    //-------------------------------------------------------------------------------------------------------------------
+
     printf("Thread B: Acquired semaphore 1.\n");
     sem_post(&sem1);
     sem_post(&sem2);
@@ -49,11 +51,12 @@ int main()
     sem_init(&sem1, 0, 1);
     sem_init(&sem2, 0, 1);
 
-    // Create two threads
+    // Create and run two threads
     pthread_create(&thread_id1, NULL, threadA, NULL);
     pthread_create(&thread_id2, NULL, threadB, NULL);
 
     // Lines after this won't be executed.
+    //-------------------------------------------------------------------------------------------------------------------
 
     // Wait for those threads to join the main thread
     pthread_join(thread_id1, NULL);

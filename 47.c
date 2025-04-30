@@ -19,8 +19,8 @@ d. Remove the shared memory
 
 int main()
 {
-    // a. Create shared memory
-    int shmid = shmget(ftok(".", 'a'), 1024, IPC_CREAT | 0666);
+    // a. Create shared memory and write "Hello World!" to it
+    int shmid = shmget(ftok(".", 'a'), 1024, IPC_CREAT | 0666); // fxn def: int shmget(key_t __key, size_t __size, int __shmflg)
     // and attach it for writing
     char *shm_ptr = (char *)shmat(shmid, NULL, 0); // 0 means attach for both reading and writing
     strcpy(shm_ptr, "Hello World!");
@@ -34,7 +34,7 @@ int main()
     // Attempt to overwrite
     // strcpy(shm_ptr, "Trying to overwrite!"); // Uncommenting leads to "Segmentation fault (core dumped)"
 
-    // c. Detach read-only
+    // c. Detach the read-only shared memory
     shmdt(shm_ptr);
 
     // d. Remove shared memory

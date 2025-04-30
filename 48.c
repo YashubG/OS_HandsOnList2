@@ -15,8 +15,7 @@ int main()
     // a. Create a binary semaphore
     sem_t myBinarySemaphore; // Create a semaphor
 
-    // Function prototype of sem_init:
-    //  int sem_init(sem_t *__sem, int __pshared, unsigned int __value)
+    // Function prototype of sem_init: int sem_init(sem_t *__sem, int __pshared, unsigned int __value)
     sem_init(&myBinarySemaphore, 0, 1); // Initialise the semaphore
                                         // 0 means this semaphore is not shared
                                         // 1 means the MAX values is 1, i.e., this is a binary semaphore
@@ -32,5 +31,6 @@ int main()
 
     printf("Counting semaphore created and initialized with value 5.\n");
 
-    // Ideally, we should also have destroyed the semaphores after using then.
+    // Ideally, we should also have destroyed the semaphores after using then, but since we are writing simple
+    //  programs just for demonstration, we will let the OS do that.
 }
