@@ -17,15 +17,15 @@ int main()
 
     struct msqid_ds buf;
 
-    // Get current settings
+    // Get current settings and permissions
     if (msgctl(msq_id, IPC_STAT, &buf) == -1)
         perror("msgctl (with cmd=IPC_STAT)");
     else
     {
-        // Change permissions: for example, set to 0700
+        // Change read/write permissions: for example, set to 0700
         buf.msg_perm.mode = 0700;
 
-        // Apply the new settings
+        // Apply the new settings using msgctl
         if (msgctl(msq_id, IPC_SET, &buf) == -1)
             perror("msgctl - IPC_SET");
         else

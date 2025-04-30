@@ -27,5 +27,4 @@ int main()
     msgsnd(msq_id, &msg, sizeof(msg.mtext), 0);
 
     printf("Message sent. Now check by entering the following into the terminal: \"ipcs -q\"\n");
-    return 0;
 }

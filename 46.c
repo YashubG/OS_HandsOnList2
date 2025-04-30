@@ -19,5 +19,5 @@ int main()
     if (msgctl(msgid, IPC_RMID, NULL) == -1) // IPC_RMID->translates to->Remove identifier.
         perror("msgctl - IPC_RMID");
     else
-        printf("Message queue removed successfully.\n");
+        printf("Message queue removed successfully. Check using 'ipcs -q'\n");
 }

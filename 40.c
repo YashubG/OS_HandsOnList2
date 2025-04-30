@@ -8,10 +8,22 @@ files that can be opened within a process and the size of a pipe (circular buffe
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
-
+#include <sys/resource.h>
+#include <errno.h>
 int main()
 {
-    long max_files = sysconf(_SC_OPEN_MAX);      // A POSIX function that retrieves system configuration variables
+    struct rlimit rlim;
+
+    if (getrlimit(RLIMIT_NOFILE, &rlim) == -1)
+    {
+        perror("getrlimit");
+        return 1;
+    }
+
+    printf("Soft limit for open files for this process: %ld\n", (long)rlim.rlim_cur);
+    printf("Hard limit for open files for this process: %ld\n", (long)rlim.rlim_max);
+
+    long max_files = sysconf(_SC_OPEN_MAX);      // A POSIX function1that retrieves system configuration variables
     long pipe_size = fpathconf(0, _PC_PIPE_BUF); // Another POSIX function that retrieves path-specific configuration variables
     // Using stdin (fd 0) as a reference, we could as well have used
     // stdout (fd 1) or stderr (fd 2) to signify system-wide property and
@@ -26,6 +38,4 @@ int main()
         printf("Size of a pipe (circular buffer): %ld bytes\n", pipe_size);
     else
         printf("Could not determine the size of a pipe.\n");
-
-    return 0;
 }
