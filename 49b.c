@@ -40,7 +40,7 @@ int main()
     struct sembuf unlock = {0, 1, SEM_UNDO};
 
     // Lock the semaphore
-    printf("Locking semaphore...\n");
+    printf("Trying to get semaphore lock ...\n");
     if (semop(semid, &lock, 1) == -1)
     {
         perror("semop");
@@ -49,11 +49,11 @@ int main()
 
     // Inside critical section
     printf("Inside critical section...\n");
-    printf("Enter the message: ");
+    printf("Enter the message to write into CS: ");
     scanf(" %[^\n]", (char *)data);
 
     // Release the semaphore
-    printf("Unlocking semaphore...\n");
+    printf("Trying to unlock the semaphore...\n");
     if (semop(semid, &unlock, 1) == -1)
     {
         perror("semop");
