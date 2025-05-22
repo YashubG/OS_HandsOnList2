@@ -8,36 +8,60 @@ c. Protect multiple pseudo resources (maybe two) using a counting semaphore
 d. Remove the created semaphore
 */
 #include <stdio.h>
-#include <pthread.h>
-#include <semaphore.h>
 #include <unistd.h>
-
-sem_t mutex; // Binary semaphore
-
-void *thread_function(void *arg)
-{
-    (void)arg;
-
-    sem_wait(&mutex); // Acquire semaphore (enter critical section)
-    printf("Thread %lu: Inside critical section\n", pthread_self());
-    sleep(1);
-    printf("Thread %lu: Exiting critical section\n", pthread_self());
-    sem_post(&mutex); // Release semaphore (exit critical section)
-
-    pthread_exit(NULL);
-}
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
+#include <stdlib.h>
 
 int main()
 {
-    pthread_t thread1, thread2;
+    // Generate keys for semaphore and shared memory
+    key_t sem_key = ftok(".", 'c');
+    key_t shm_key = ftok(".", 'a');
 
-    sem_init(&mutex, 0, 1); // Initialize as a binary semaphore (initial value 1)
+    // Create or get semaphore
+    int semid = semget(sem_key, 1, IPC_CREAT | IPC_EXCL | 0644);
+    if (semid == -1)
+    {
+        semid = semget(sem_key, 1, 0);
+    }
+    else
+    {
+        semctl(semid, 0, SETVAL, 1); // Initialize semaphore value to 1
+    }
 
-    pthread_create(&thread1, NULL, thread_function, NULL);
-    pthread_create(&thread2, NULL, thread_function, NULL);
+    // Attach shared memory
+    int shmid = shmget(shm_key, 1024, IPC_CREAT | 0644);
+    void *data = shmat(shmid, NULL, 0);
 
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
+    // Define semaphore operation structures
+    struct sembuf lock = {0, -1, SEM_UNDO};
+    struct sembuf unlock = {0, 1, SEM_UNDO};
 
-    sem_destroy(&mutex); // Clean up the semaphore
+    // Lock the semaphore
+    printf("Locking semaphore...\n");
+    if (semop(semid, &lock, 1) == -1)
+    {
+        perror("semop");
+        exit(EXIT_FAILURE);
+    }
+
+    // Inside critical section
+    printf("Inside critical section...\n");
+    printf("Enter the message: ");
+    scanf(" %[^\n]", (char *)data);
+
+    // Release the semaphore
+    printf("Unlocking semaphore...\n");
+    if (semop(semid, &unlock, 1) == -1)
+    {
+        perror("semop");
+        exit(EXIT_FAILURE);
+    }
+
+    // Detach shared memory
+    shmdt(data);
+
+    return 0;
 }
